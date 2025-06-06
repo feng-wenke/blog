@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的操作记录博客</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f9f9f9;
+            padding-top: 56px;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        .blog-header {
+            background-color: #fff;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        
+        .blog-title {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .blog-description {
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+        
+        .card {
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-title {
+            font-weight: 600;
+        }
+        
+        .card-text {
+            color: #6c757d;
+        }
+        
+        .tag {
+            display: inline-block;
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .sidebar {
+            background-color: #fff;
+            padding: 1.5rem;
+            border-radius: 0.25rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        
+        .sidebar-heading {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .category-item {
+            display: block;
+            padding: 0.5rem 0;
+            color: #495057;
+            text-decoration: none;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .category-item:hover {
+            color: #007bff;
+        }
+        
+        .category-item.active {
+            color: #007bff;
+            font-weight: 600;
+        }
+        
+        .category-count {
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 0.1rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+        }
+        
+        .search-form {
+            margin-bottom: 1.5rem;
+        }
+        
+        .blog-footer {
+            margin-top: 3rem;
+            padding: 2rem 0;
+            background-color: #fff;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        
+        .post-meta {
+            color: #6c757d;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .post-content {
+            margin-bottom: 1.5rem;
+        }
+        
+        .post-content p {
+            margin-bottom: 1rem;
+        }
+        
+        .pagination {
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .new-post-btn {
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .form-label {
+            font-weight: 600;
+        }
+        
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">操作记录博客</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="categoriesLink">分类</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="archiveLink">归档</a>
+                    </li>
+                </ul>
+                <form class="d-flex" id="headerSearchForm">
+                    <input class="form-control me-2" type="search" placeholder="搜索文章..." id="headerSearchInput">
+                    <button class="btn btn-outline-light" type="submit">搜索</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 博客头部 -->
+    <header class="blog-header">
+        <div class="container">
+            <h1 class="blog-title">我的操作记录博客</h1>
+            <p class="blog-description">记录日常操作、学习笔记和心得体会</p>
+            <button class="btn btn-primary new-post-btn" data-bs-toggle="modal" data-bs-target="#newPostModal">
+                <i class="bi bi-plus-circle me-1"></i> 新建记录
+            </button>
+        </div>
+    </header>
+
+    <!-- 主要内容区 -->
+    <main class="container">
+        <div class="row">
+            <!-- 文章列表 -->
+            <div class="col-md-8" id="postsContainer">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>最新记录</h2>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            排序方式
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="sortDropdown">
+                            <li><a class="dropdown-item sort-option" data-sort="newest" href="#">最新发布</a></li>
+                            <li><a class="dropdown-item sort-option" data-sort="oldest" href="#">最早发布</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- 文章卡片将通过JS动态生成 -->
+            </div>
+            
+            <!-- 侧边栏 -->
+            <div class="col-md-4">
+                <div class="sidebar mb-4">
+                    <h3 class="sidebar-heading">搜索</h3>
+                    <form class="search-form" id="sidebarSearchForm">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="搜索文章..." id="sidebarSearchInput">
+                            <button class="btn btn-outline-secondary" type="submit">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="sidebar mb-4">
+                    <h3 class="sidebar-heading">分类</h3>
+                    <div id="categoriesList">
+                        <!-- 分类列表将通过JS动态生成 -->
+                    </div>
+                </div>
+                
+                <div class="sidebar">
+                    <h3 class="sidebar-heading">归档</h3>
+                    <div id="archiveList">
+                        <!-- 归档列表将通过JS动态生成 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="blog-footer">
+        <div class="container">
+            <p>© 2023 我的操作记录博客 | 用心记录每一个操作</p>
+            <p>
+                <a href="#" class="text-decoration-none">关于我</a> · 
+                <a href="#" class="text-decoration-none">联系我</a> · 
+                <a href="#" class="text-decoration-none">隐私政策</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- 新建文章模态框 -->
+    <div class="modal fade" id="newPostModal" tabindex="-1" aria-labelledby="newPostModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="newPostModalLabel">新建操作记录</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="newPostForm">
+                        <div class="mb-3">
+                            <label for="postTitle" class="form-label">标题</label>
+                            <input type="text" class="form-control" id="postTitle" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="postCategory" class="form-label">分类</label>
+                            <select class="form-select" id="postCategory" required>
+                                <option value="">选择分类...</option>
+                                <option value="工作">工作</option>
+                                <option value="学习">学习</option>
+                                <option value="生活">生活</option>
+                                <option value="技术">技术</option>
+                                <option value="其他">其他</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="postTags" class="form-label">标签（用逗号分隔）</label>
+                            <input type="text" class="form-control" id="postTags" placeholder="例如：笔记,会议,项目">
+                        </div>
+                        <div class="mb-3">
+                            <label for="postContent" class="form-label">内容</label>
+                            <textarea class="form-control" id="postContent" rows="10" required></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="savePostBtn">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 文章详情模态框 -->
+    <div class="modal fade" id="postDetailModal" tabindex="-1" aria-labelledby="postDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="postDetailModalLabel">文章详情</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h3 id="detailTitle"></h3>
+                    <div class="post-meta">
+                        <span id="detailDate"></span> | 
+                        <span id="detailCategory"></span>
+                    </div>
+                    <div id="detailTags" class="mb-3"></div>
+                    <div id="detailContent"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-danger" id="deletePostBtn">删除</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提示消息 -->
+    <div class="toast-container">
+        <div class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" id="successToast">
+            <div class="d-flex">
+                <div class="toast-body">
+                    操作成功！
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入Bootstrap和自定义JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showPostDetail(postId) {
+    const post = posts.find(p => p.id === postId);
+    if (post) {
+        document.getElementById('detailTitle').textContent = post.title;
+        document.getElementById('detailDate').textContent = post.date;
+        document.getElementById('detailCategory').textContent = post.category;
+        document.getElementById('detailContent').innerHTML = post.content.replace(/\n/g, '<br>');
+        
+        // 渲染标签
+        const tagsContainer = document.getElementById('detailTags');
+        tagsContainer.innerHTML = '';
+        post.tags.forEach(tag => {
+            const tagElement = document.createElement('span');
+            tagElement.className = 'tag';
+            tagElement.textContent = tag;
+            tagsContainer.appendChild(tagElement);
+        });
+        
+        // 设置当前文章ID
+        currentPostId = postId;
+        
+        // 显示模态框
+        const modal = new bootstrap.Modal(document.getElementById('postDetailModal'));
+        modal.show();
+    }
+}
+
+        // 示例数据
+        let posts = [
+            {
+                id: 1,
+                title: "项目启动会议记录",
+                category: "工作",
+                tags: ["会议", "项目", "计划"],
+                content: "今天参加了新项目的启动会议，会议主要内容如下：\n\n1. 项目背景和目标介绍\n2. 团队成员及分工\n3. 项目时间线和关键节点\n4. 风险评估和应对措施\n\n会议决定下周一开始进行详细的需求分析，我负责整理会议纪要并发送给所有参会人员。",
+                date: "2023-11-15"
+            },
+            {
+                id: 2,
+                title: "学习Vue.js框架笔记",
+                category: "学习",
+                tags: ["前端", "Vue", "笔记"],
+                content: "今天学习了Vue.js的基础知识，包括：\n\n- Vue实例和生命周期\n- 模板语法\n- 计算属性和侦听器\n- 条件渲染和列表渲染\n- 事件处理\n\n明天计划学习组件系统和路由，希望能尽快掌握这个框架。",
+                date: "2023-11-14"
+            },
+            {
+                id: 3,
+                title: "周末家庭聚会",
+                category: "生活",
+                tags: ["家庭", "聚会", "周末"],
+                content: "周末参加了家庭聚会，大家一起去吃了火锅，聊了很多近况。孩子们玩得很开心，我也放松了一下。下周计划整理聚会照片并分享给家人。",
+                date: "2023-11-12"
+            },
+            {
+                id: 4,
+                title: "服务器配置记录",
+                category: "技术",
+                tags: ["服务器", "配置", "Linux"],
+                content: "今天配置了一台新的服务器，主要步骤如下：\n\n1. 更新系统并安装必要软件\n2. 配置防火墙规则\n3. 安装Nginx和PHP\n4. 设置网站目录和权限\n5. 配置域名解析\n\n服务器IP: 192.168.1.100\n用户名: admin\n密码: ********\n\n需要定期备份重要数据。",
+                date: "2023-11-10"
+            },
+            {
+                id: 5,
+                title: "健身计划调整",
+                category: "生活",
+                tags: ["健身", "计划", "健康"],
+                content: "根据最近的身体状况，调整了健身计划：\n\n- 每周3次力量训练，每次45分钟\n- 每周2次有氧运动，每次30分钟\n- 增加拉伸和柔韧性训练\n\n目标是提高整体健康水平，增强体能。记录体重和围度变化，每周测量一次。",
+                date: "2023-11-08"
+            }
+        ];
+
+        // 当前查看的文章ID
+        let currentPostId = null;
+
+        // DOM加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化显示文章
+            renderPosts(posts);
+            renderCategories();
+            renderArchive();
+            
+            // 搜索表单提交事件
+            document.getElementById('headerSearchForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const searchTerm = document.getElementById('headerSearchInput').value.trim().toLowerCase();
+                searchPosts(searchTerm);
+            });
+            
+            document.getElementById('sidebarSearchForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const searchTerm = document.getElementById('sidebarSearchInput').value.trim().toLowerCase();
+                searchPosts(searchTerm);
+            });
+            
+            // 保存文章按钮点击事件
+            document.getElementById('savePostBtn').addEventListener('click', savePost);
+            
+            // 删除文章按钮点击事件
+            document.getElementById('deletePostBtn').addEventListener('click', deletePost);
+            
+            // 排序选项点击事件
+            document.querySelectorAll('.sort-option').forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const sortBy = this.getAttribute('data-sort');
+                    sortPosts(sortBy);
+                });
+            });
+            
+            // 分类链接点击事件
+            document.getElementById('categoriesLink').addEventListener('click', function(e) {
+                e.preventDefault();
+                // 这里可以实现分类筛选功能
+                showToast('分类功能即将上线，敬请期待！');
+            });
+            
+            // 归档链接点击事件
+            document.getElementById('archiveLink').addEventListener('click', function(e) {
+                e.preventDefault();
+                // 这里可以实现归档筛选功能
+                showToast('归档功能即将上线，敬请期待！');
+            });
+        });
+
+        // 渲染文章列表
+        function renderPosts(postsToRender) {
+            const container = document.getElementById('postsContainer');
+            const postsHTML = postsToRender.map(post => {
+                const tagsHTML = post.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
+                
+                return `
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">${post.title}</h5>
+                        <div class="post-meta">
+                            <i class="bi bi-calendar3"></i> ${post.date} | 
+                            <i class="bi bi-folder"></i> ${post.category}
+                        </div>
+                        <div class="mb-3">
+                            ${tagsHTML}
+                        </div>
+                        <p class="card-text">${post.content.substring(0, 150)}${post.content.length > 150 ? '...' : ''}</p>
+                        <button class="btn btn-outline-primary btn-sm view-post" data-id="${post.id}">阅读更多</button>
+                    </div>
+                </div>
+                `;
+            }).join('');
+            
+            // 保留排序和标题部分
+            const titleAndSort = container.querySelector('.d-flex');
+            container.innerHTML = '';
+            container.appendChild(titleAndSort);
+            
+            // 添加文章卡片
+            const postsWrapper = document.createElement('div');
+            postsWrapper.innerHTML = postsHTML;
+            container.appendChild(postsWrapper);
+            
+            // 添加查看文章事件
+            document.querySelectorAll('.view-post').forEach(button => {
+                button.addEventListener('click', function() {
+                    const postId = parseInt(this.getAttribute('data-id'));
+                    showPostDetail(postId);
+                });
+            });
+        }
+
+        // 渲染分类列表
+        function renderCategories() {
+            const categories = ['工作', '学习', '生活', '技术', '其他'];
+            const categoriesHTML = categories.map(category => {
+                const count = posts.filter(post => post.category === category).length;
+                return `
+                <a href="#" class="category-item" data-category="${category}">
+                    ${category} <span class="category-count">${count}</span>
+                </a>
+                `;
+            }).join('');
+            
+            document.getElementById('categoriesList').innerHTML = categoriesHTML;
+            
+            // 添加分类点击事件
+            document.querySelectorAll('.category-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const category = this.getAttribute('data-category');
+                    filterByCategory(category);
+                });
+            });
+        }
+
+        // 渲染归档列表
+        function renderArchive() {
+            const years = [...new Set(posts.map(post => post.date.substring(0, 4)))].sort((a, b) => b - a);
+            const archiveHTML = years.map(year => {
+                const yearPosts = posts.filter(post => post.date.startsWith(year));
+                const months = [...new Set(yearPosts.map(post => post.date.substring(5, 7)))].sort((a, b) => b - a);
+                
+                let monthsHTML = '';
+                months.forEach(month => {
+                    const monthName = new Date(year, month - 1, 1).toLocaleString('zh-CN', { month: 'long' });
+                    const monthPosts = yearPosts.filter(post => post.date.substring(5, 7) === month);
+                    
+                    monthsHTML += `
+                    <div class="mb-3">
+                        <a href="#" class="category-item" data-year="${year}" data-month="${month}">
+                            ${monthName} <span class="category-count">${monthPosts.length}</span>
+                        </a>
+                    </div>
+                    `;
+                });
+                
+                return `
+                <div class="mb-4">
+                    <h6>${year}年</h6>
+                    ${monthsHTML}
+                </div>
+                `;
+            }).join('');
+            
+            document.getElementById('archiveList').innerHTML = archiveHTML;
+            
+            // 添加归档点击事件
+            document.querySelectorAll('#archiveList .category-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const year = this.getAttribute('data-year');
+                    const month = this.getAttribute('data-month');
+                    filterByArchive(year, month);
+                });
+            });
+        }
+
+        // 显示文章详情
+        function showPostDetail(postId) {
+            const post = posts.find(p => p.id === postId);
+            if (!post) return;
+            
+            currentPostId = postId;
+            
+            document.getElementById('detailTitle').textContent = post.title;
+            document.getElementById('detailDate').textContent = post.date;
+            document.getElementById('detailCategory').textContent = post.category;
+            
+            const tagsHTML = post.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
+            document.getElementById('detailTags').innerHTML = tagsHTML;
+            
+            // 将换行符转换为<br>标签
+            document.getElementById('detailContent').innerHTML = post.content.replace(/\n/g, '<br>');
+            
+            const modal = new bootstrap.Modal(document.getElementById('postDetailModal'));
+            modal.show();
+        }
+
+        // 保存新文章
+        function savePost() {
+            const title = document.getElementById('postTitle').value.trim();
+            const category = document.getElementById('postCategory').value;
+            const tagsInput = document.getElementById('postTags').value.trim();
+            const content = document.getElementById('postContent').value.trim();
+            
+            if (!title || !category || !content) {
+                alert('请填写必填字段！');
+                return;
+            }
+            
+            const tags = tagsInput ? tagsInput.split(',').map(tag => tag.trim()) : [];
+            
+            // 创建新文章
+            const newPost = {
+                id: posts.length > 0 ? Math.max(...posts.map(p => p.id)) + 1 : 1,
+                title,
+                category,
+                tags,
+                content,
+                date: new Date().toISOString().split('T')[0]
+            };
+            
+            // 添加到文章列表
+            posts.unshift(newPost);
+            
+            // 重新渲染
+            renderPosts(posts);
+            renderCategories();
+            renderArchive();
+            
+            // 关闭模态框
+            const modal = bootstrap.Modal.getInstance(document.getElementById('newPostModal'));
+            modal.hide();
+            
+            // 重置表单
+            document.getElementById('newPostForm').reset();
+            
+            // 显示成功提示
+            showToast('文章保存成功！');
+        }
+
+        document.getElementById('deletePostBtn').addEventListener('click', deletePost);
+
+        // 删除文章
+        function deletePost() {
+    if (!currentPostId) return;
+    
+    // 找到要删除的文章索引
+    const index = posts.findIndex(p => p.id === currentPostId);
+    if (index !== -1) {
+        // 从数组中删除
+        posts.splice(index, 1);
+        
+        // 更新本地存储
+        localStorage.setItem('posts', JSON.stringify(posts));
+        
+        // 重新渲染
+        renderPosts(posts);
+        renderCategories();
+        renderArchive();
+        
+        // 关闭模态框
+        const modal = bootstrap.Modal.getInstance(document.getElementById('postDetailModal'));
+        modal.hide();
+        
+        // 显示成功提示
+        showToast('文章已删除！');
+    } else {
+        console.error('文章未找到');
+        showToast('删除失败：文章未找到', 'danger');
+    }
+}
+
+
+
+        // 搜索文章
+        function searchPosts(term) {
+            if (!term) {
+                renderPosts(posts);
+                return;
+            }
+            
+            const results = posts.filter(post => 
+                post.title.toLowerCase().includes(term) || 
+                post.content.toLowerCase().includes(term) || 
+                post.category.toLowerCase().includes(term) || 
+                post.tags.some(tag => tag.toLowerCase().includes(term))
+            );
+            
+            renderPosts(results);
+            
+            if (results.length === 0) {
+                const container = document.getElementById('postsContainer');
+                const titleAndSort = container.querySelector('.d-flex');
+                container.innerHTML = '';
+                container.appendChild(titleAndSort);
+                
+                const noResults = document.createElement('div');
+                noResults.className = 'alert alert-info';
+                noResults.textContent = '没有找到匹配的文章，请尝试其他关键词。';
+                container.appendChild(noResults);
+            }
+        }
+
+        // 按分类筛选
+        function filterByCategory(category) {
+            const filtered = posts.filter(post => post.category === category);
+            renderPosts(filtered);
+            
+            // 高亮选中的分类
+            document.querySelectorAll('.category-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-category') === category) {
+                    item.classList.add('active');
+                }
+            });
+            
+            showToast(`已筛选 "${category}" 分类的文章`);
+        }
+
+        // 按归档筛选
+        function filterByArchive(year, month) {
+            const filtered = posts.filter(post => 
+                post.date.startsWith(year) && post.date.substring(5, 7) === month
+            );
+            renderPosts(filtered);
+            
+            showToast(`已筛选 ${year}年${month}月的文章`);
+        }
+
+        // 排序文章
+        function sortPosts(sortBy) {
+            let sorted = [...posts];
+            
+            if (sortBy === 'newest') {
+                sorted.sort((a, b) => new Date(b.date) - new Date(a.date));
+            } else if (sortBy === 'oldest') {
+                sorted.sort((a, b) => new Date(a.date) - new Date(b.date));
+            }
+            
+            renderPosts(sorted);
+            showToast(`已按${sortBy === 'newest' ? '最新' : '最早'}发布排序`);
+        }
+
+        // 显示提示消息
+        function showToast(message) {
+            const toast = document.getElementById('successToast');
+            const toastBody = toast.querySelector('.toast-body');
+            toastBody.textContent = message;
+            
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+        }
+    </script>
+</body>
+</html>
